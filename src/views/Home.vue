@@ -7,7 +7,6 @@ const state = reactive({
 </script>
 
 <template lang="pug">
-Header
 .container
   el-button.text-button home
 
