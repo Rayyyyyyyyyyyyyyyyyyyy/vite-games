@@ -48,7 +48,7 @@ export default defineConfig({
           template: 'index.html',
           injectOptions: {
             data: {
-              title: 'The-Trip',
+              title: 'Vite-sudoku',
               icoUrl: './public/vite.svg'
             }
           }
