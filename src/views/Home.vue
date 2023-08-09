@@ -68,8 +68,9 @@ const doResetSudokuGame = () => {
 
 const clickItemBox = (rowIdx: number, colIdx: number) => {
   if (
-    state.testAns[rowIdx][colIdx] == '.' ||
-    typeof state.testAns[rowIdx][colIdx] == 'number'
+    (state.testAns[rowIdx][colIdx] == '.' ||
+      typeof state.testAns[rowIdx][colIdx] == 'number') &&
+    state.showTime
   ) {
     state.rowIdx = rowIdx
     state.colIdx = colIdx
@@ -165,7 +166,7 @@ const numButtonDisable = computed(() => {
                             'cursor-pointer': item == '.',
                             'active-item': idx == state.rowIdx && index == state.colIdx && (item == '.' || typeof item == 'number'),
                             'error-item': idx == state.rowIdx && index == state.colIdx && (checkRowIncludes(item) || checkColIncludes(item) || checkBoxIncludes(item)) && typeof item == 'number',
-                            'text-primary' : typeof item == 'number'}`
+                            'text-primary font-bold' : typeof item == 'number'}`
                     @click="clickItemBox(idx, index)"
                     ) {{ item == '.' ? '' : item }}
 
@@ -233,7 +234,7 @@ const numButtonDisable = computed(() => {
 
   .num-row {
     @apply flex items-center justify-between;
-    @apply mt-10 w-2/4 mx-auto;
+    @apply mt-10 w-2/5 mx-auto;
   }
   .num-box {
     @apply w-10 h-10;
