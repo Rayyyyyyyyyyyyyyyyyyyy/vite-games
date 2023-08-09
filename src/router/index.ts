@@ -4,15 +4,21 @@ import RouterNames from './name'
 const routes = [
   {
     path: '/',
-    name: RouterNames.home,
-    component: () => import('@/views/Home.vue')
+    name: RouterNames.homeLayout,
+    component: () => import('@/layout/HomeLayout.vue'),
+    children: [
+      {
+        path: '/home',
+        name: RouterNames.home,
+        component: () => import('@/views/Home.vue')
+      }
+    ]
   },
-
 
   {
     path: '/:catchAll(.*)',
     name: RouterNames.page404,
-    component: () => import('@/views/Home.vue')
+    component: () => import('@/views/NotFound.vue')
   }
 ]
 export default createRouter({

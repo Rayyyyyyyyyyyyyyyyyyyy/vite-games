@@ -1,6 +1,6 @@
 const _RouterNames = {
-
   home: 'home',
+  homeLayout: 'homeLayout',
 
   page404: 'page404'
 }
