@@ -3,16 +3,17 @@ import { useRouter } from 'vue-router'
 import RouterNames from '@/router/name.ts'
 
 const router = useRouter()
-
 onMounted(() => {
   router.push({
-    name: RouterNames.home
+    name: RouterNames.sudoku
   })
 })
 </script>
 
 <template lang="pug">
-router-view
+.container
+  Header
+  router-view
 </template>
 
 <style lang="scss" scoped></style>

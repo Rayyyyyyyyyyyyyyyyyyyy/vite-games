@@ -8,9 +8,14 @@ const routes = [
     component: () => import('@/layout/HomeLayout.vue'),
     children: [
       {
-        path: '/home',
-        name: RouterNames.home,
-        component: () => import('@/views/Home.vue')
+        path: '/sudoku',
+        name: RouterNames.sudoku,
+        component: () => import('@/views/Sudoku.vue')
+      },
+      {
+        path: '/snake',
+        name: RouterNames.snake,
+        component: () => import('@/views/Snake.vue')
       }
     ]
   },

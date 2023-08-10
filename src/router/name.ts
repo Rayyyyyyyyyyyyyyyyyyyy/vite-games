@@ -1,6 +1,7 @@
 const _RouterNames = {
-  home: 'home',
   homeLayout: 'homeLayout',
+  sudoku: 'sudoku',
+  snake: 'snake',
 
   page404: 'page404'
 }
