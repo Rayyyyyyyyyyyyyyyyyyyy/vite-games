@@ -12,15 +12,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: "SvgIcon",
+  name: 'SvgIcon',
   props: {
     name: {
       type: String,
       required: true,
-      default: "logo"
+      default: ''
     },
     width: {
       type: Number,
@@ -32,15 +32,15 @@ export default defineComponent({
     },
     color: {
       type: String,
-      default: "inherit"
+      default: 'inherit'
     }
   },
   setup(props) {
     return {
       props
-    };
+    }
   }
-});
+})
 </script>
 
 <style lang="scss" scoped>

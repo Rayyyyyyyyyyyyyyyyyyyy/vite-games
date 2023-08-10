@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeRouteLeave } from 'vue-router'
+import SvgIcon from '@/components/SvgIcon.vue'
 
 const defaultSudoku = [
   ['5', '3', '.', '.', '7', '.', '.', '.', '.'],
@@ -12,65 +12,39 @@ const defaultSudoku = [
   ['.', '.', '.', '4', '1', '9', '.', '.', '5'],
   ['.', '.', '.', '.', '8', '.', '.', '7', '9']
 ]
+const emptySudoku = [
+  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
+  ['.', '.', '.', '.', '.', '.', '.', '.', '.']
+]
 
 const state = reactive({
   testAns: [] as string[][],
-  showTime: false,
-  gameTime: '00:00:00',
 
   rowIdx: -1,
-  colIdx: -1
+  colIdx: -1,
+  animateHandler: false
 })
 onMounted(() => {
   doResetSudokuGame()
-  state.showTime = false
-  state.gameTime = '00:00:00'
-})
-
-let totalSeconds = 0
-let interval
-
-const getStartGame = (isStart: boolean) => {
-  state.showTime = isStart
-  clearInterval(interval)
-  totalSeconds = 0
-  state.gameTime = '00:00:00'
-  if (isStart) {
-    interval = setInterval(updateTimer, 1000)
-  } else {
-    state.rowIdx = -1
-    state.colIdx = -1
-  }
-}
-const updateTimer = () => {
-  totalSeconds++
-  const hours = Math.floor(totalSeconds / 3600)
-  const minutes = Math.floor((totalSeconds % 3600) / 60)
-  const seconds = totalSeconds % 60
-
-  state.gameTime = `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(
-    seconds
-  )}`
-}
-const formatTime = (time: number) => {
-  return time < 10 ? `0${time}` : time
-}
-
-onBeforeRouteLeave(() => {
-  clearInterval(interval)
 })
 
 const doResetSudokuGame = () => {
   state.rowIdx = -1
   state.colIdx = -1
-  state.testAns = JSON.parse(JSON.stringify(defaultSudoku))
+  state.testAns = JSON.parse(JSON.stringify(emptySudoku))
 }
 
 const clickItemBox = (rowIdx: number, colIdx: number) => {
   if (
-    (state.testAns[rowIdx][colIdx] == '.' ||
-      typeof state.testAns[rowIdx][colIdx] == 'number') &&
-    state.showTime
+    state.testAns[rowIdx][colIdx] == '.' ||
+    typeof state.testAns[rowIdx][colIdx] == 'number'
   ) {
     state.rowIdx = rowIdx
     state.colIdx = colIdx
@@ -146,12 +120,29 @@ const setStartIndex = ind => {
 const numButtonDisable = computed(() => {
   return state.rowIdx == -1 || state.colIdx == -1 || state.showTime == false
 })
+let interval
+const startAnimate = () => {
+  state.animateHandler = true
+  interval = setInterval(setRandomAnswer, 100)
+  setTimeout(() => {
+    clearInterval(interval)
+    state.animateHandler = false
+    state.testAns = JSON.parse(JSON.stringify(defaultSudoku))
+  }, 1500)
+}
+
+const setRandomAnswer = () => {
+  for (let i = 0; i < state.testAns.length; i++) {
+    for (let j = 0; j < state.testAns[i].length; j++) {
+      state.testAns[i][j] = Math.floor(Math.random() * (9 - 1 + 1)) + 1
+    }
+  }
+}
 </script>
 
 <template lang="pug">
 .container
-    .time-clock
-        p(v-if="state.showTime") {{ state.gameTime }}
+
     .border-box
         .sudoku-row(
             v-for="(it, idx) in state.testAns"
@@ -180,21 +171,19 @@ const numButtonDisable = computed(() => {
 
 
 
-    .flex-center.mt-10
-      el-button(type="primary" @click="getStartGame(true)") Start
-      el-button(type="info" @click="getStartGame(false)") Finish
+    .footer
       el-button(type="info" :plain="true"
       @click="doResetSudokuGame") Reset
+      svg-icon.dice-icon.animate__animated(
+          @click='startAnimate'
+      :class="{'animate__wobble': state.animateHandler}"
+          name="dice" color="#409eff" )
 
 </template>
 
 <style lang="scss" scoped>
 .container {
   @apply flex flex-col justify-center items-center;
-
-  .time-clock {
-    @apply h-10;
-  }
 
   .border-box {
     @apply border-2 border-secondary;
@@ -235,12 +224,20 @@ const numButtonDisable = computed(() => {
   .num-row {
     @apply flex items-center justify-between;
     @apply mt-10 w-2/5 mx-auto;
-  }
-  .num-box {
-    @apply w-10 h-10;
 
-    &:hover {
-      @apply bg-primary;
+    .num-box {
+      @apply w-10 h-10;
+
+      &:hover {
+        @apply bg-primary;
+      }
+    }
+  }
+  .footer {
+    @apply flex items-center mt-10 w-1/2 justify-end;
+
+    .dice-icon {
+      @apply ml-6 cursor-pointer;
     }
   }
 }
