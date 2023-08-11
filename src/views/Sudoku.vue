@@ -116,8 +116,12 @@ const startAnimate = () => {
     const questIndex =
       Math.floor(Math.random() * (sudokuExamQuestionsList.length - 1 + 1)) + 1
     const defaultSudoku = sudokuExamQuestionsList[questIndex]
-    state.pureQuest = JSON.parse(JSON.stringify(defaultSudoku))
-    state.testAns = JSON.parse(JSON.stringify(defaultSudoku))
+    if (defaultSudoku) {
+      state.pureQuest = JSON.parse(JSON.stringify(defaultSudoku))
+      state.testAns = JSON.parse(JSON.stringify(defaultSudoku))
+    } else {
+      startAnimate()
+    }
     state.sudokuIsEmpty = false
   }, 1500)
 }
