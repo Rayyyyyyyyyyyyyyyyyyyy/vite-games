@@ -1,49 +1,35 @@
 <script setup lang="ts">
 import SvgIcon from '@/components/SvgIcon.vue'
-
-const defaultSudoku = [
-  ['5', '3', '.', '.', '7', '.', '.', '.', '.'],
-  ['6', '.', '.', '1', '9', '5', '.', '.', '.'],
-  ['.', '9', '8', '.', '.', '.', '.', '6', '.'],
-  ['8', '.', '.', '.', '6', '.', '.', '.', '3'],
-  ['4', '.', '.', '8', '.', '3', '.', '.', '1'],
-  ['7', '.', '.', '.', '2', '.', '.', '.', '6'],
-  ['.', '6', '.', '.', '.', '.', '2', '8', '.'],
-  ['.', '.', '.', '4', '1', '9', '.', '.', '5'],
-  ['.', '.', '.', '.', '8', '.', '.', '7', '9']
-]
-const emptySudoku = [
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.'],
-  ['.', '.', '.', '.', '.', '.', '.', '.', '.']
-]
+import { emptySudoku, sudokuExamQuestionsList } from '@/const/sudokuConst.ts'
 
 const state = reactive({
   testAns: [] as string[][],
+  pureQuest: [] as string[][],
 
   rowIdx: -1,
   colIdx: -1,
-  animateHandler: false
+  animateHandler: false,
+  sudokuIsEmpty: true
 })
 onMounted(() => {
-  doResetSudokuGame()
+  doResetSudokuGame(false)
 })
 
-const doResetSudokuGame = () => {
+const doResetSudokuGame = (isResetClick: boolean = false) => {
   state.rowIdx = -1
   state.colIdx = -1
-  state.testAns = JSON.parse(JSON.stringify(emptySudoku))
+  if (isResetClick) {
+    state.testAns = JSON.parse(JSON.stringify(state.pureQuest))
+    state.sudokuIsEmpty = false
+  } else {
+    state.testAns = JSON.parse(JSON.stringify(emptySudoku))
+    state.sudokuIsEmpty = true
+  }
 }
 
 const clickItemBox = (rowIdx: number, colIdx: number) => {
   if (
-    state.testAns[rowIdx][colIdx] == '.' ||
+    (state.testAns[rowIdx][colIdx] == '.' && !state.sudokuIsEmpty) ||
     typeof state.testAns[rowIdx][colIdx] == 'number'
   ) {
     state.rowIdx = rowIdx
@@ -118,20 +104,25 @@ const setStartIndex = ind => {
 }
 
 const numButtonDisable = computed(() => {
-  return state.rowIdx == -1 || state.colIdx == -1 || state.showTime == false
+  return state.rowIdx == -1 || state.colIdx == -1 || state.sudokuIsEmpty
 })
 let interval
 const startAnimate = () => {
   state.animateHandler = true
-  interval = setInterval(setRandomAnswer, 100)
+  interval = setInterval(setRandomAnimate, 100)
   setTimeout(() => {
     clearInterval(interval)
     state.animateHandler = false
+    const questIndex =
+      Math.floor(Math.random() * (sudokuExamQuestionsList.length - 1 + 1)) + 1
+    const defaultSudoku = sudokuExamQuestionsList[questIndex]
+    state.pureQuest = JSON.parse(JSON.stringify(defaultSudoku))
     state.testAns = JSON.parse(JSON.stringify(defaultSudoku))
+    state.sudokuIsEmpty = false
   }, 1500)
 }
 
-const setRandomAnswer = () => {
+const setRandomAnimate = () => {
   for (let i = 0; i < state.testAns.length; i++) {
     for (let j = 0; j < state.testAns[i].length; j++) {
       state.testAns[i][j] = Math.floor(Math.random() * (9 - 1 + 1)) + 1
@@ -142,7 +133,6 @@ const setRandomAnswer = () => {
 
 <template lang="pug">
 .container
-
     .border-box
         .sudoku-row(
             v-for="(it, idx) in state.testAns"
@@ -173,7 +163,7 @@ const setRandomAnswer = () => {
 
     .footer
       el-button(type="info" :plain="true"
-      @click="doResetSudokuGame") Reset
+      @click="doResetSudokuGame(true)") Reset
       svg-icon.dice-icon.animate__animated(
           @click='startAnimate'
       :class="{'animate__wobble': state.animateHandler}"
@@ -188,8 +178,8 @@ const setRandomAnswer = () => {
   .border-box {
     @apply border-2 border-secondary;
     @apply rounded flex flex-col;
-    width: 594px;
-    height: 594px;
+    width: 540px;
+    height: 540px;
   }
   .sudoku-row {
     @apply flex-1;
@@ -222,7 +212,7 @@ const setRandomAnswer = () => {
   }
 
   .num-row {
-    @apply flex items-center justify-between;
+    @apply flex items-center justify-center;
     @apply mt-10 w-2/5 mx-auto;
 
     .num-box {
@@ -234,7 +224,7 @@ const setRandomAnswer = () => {
     }
   }
   .footer {
-    @apply flex items-center mt-10 w-1/2 justify-end;
+    @apply flex items-center mt-10 w-1/2 justify-center;
 
     .dice-icon {
       @apply ml-6 cursor-pointer;
