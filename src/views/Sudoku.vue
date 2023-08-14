@@ -2,15 +2,26 @@
 import SvgIcon from '@/components/SvgIcon.vue'
 import { emptySudoku, sudokuExamQuestionsList } from '@/const/sudokuConst.ts'
 
+type sudokuType = string | number
+
+type stateType = {
+  testAns: sudokuType[][]
+  pureQuest: sudokuType[][]
+  rowIdx: number
+  colIdx: number
+  animateHandler: boolean
+  sudokuIsEmpty: boolean
+}
+
 const state = reactive({
-  testAns: [] as string[][],
-  pureQuest: [] as string[][],
+  testAns: [],
+  pureQuest: [],
 
   rowIdx: -1,
   colIdx: -1,
   animateHandler: false,
   sudokuIsEmpty: true
-})
+}) as stateType
 onMounted(() => {
   doResetSudokuGame(false)
 })
@@ -52,7 +63,7 @@ const doFillAns = (ans: number) => {
   }
 }
 
-const checkRowIncludes = (ans: number) => {
+const checkRowIncludes = (ans: sudokuType) => {
   let rowString = state.testAns[state.rowIdx]
   console.log('rowString', rowString)
   // 橫的
@@ -61,7 +72,7 @@ const checkRowIncludes = (ans: number) => {
     rowString.filter(_ => _ == ans).length > 1
   )
 }
-const checkColIncludes = (ans: number) => {
+const checkColIncludes = (ans: sudokuType) => {
   // 直的
   const colStr = state.testAns.map(_ => _[state.colIdx])
   console.log('col', colStr)
@@ -70,12 +81,12 @@ const checkColIncludes = (ans: number) => {
   )
 }
 
-const checkBoxIncludes = (ans: number) => {
+const checkBoxIncludes = (ans: sudokuType) => {
   // 小9宮格內
   const rowStart = setStartIndex(state.rowIdx)
   const colStart = setStartIndex(state.colIdx)
-  let boxAnsList
-  let rowList
+  let boxAnsList: sudokuType[]
+  let rowList: sudokuType[][] = []
   state.testAns.forEach((item, index) => {
     if (index == rowStart) {
       rowList = [
@@ -85,15 +96,14 @@ const checkBoxIncludes = (ans: number) => {
       ]
     }
   })
-  let boxList = []
-  rowList.forEach(item => {
+  let boxList: any[] = []
+  rowList.forEach((item: sudokuType[]) => {
     boxList.push(item.slice(colStart, colStart + 3))
   })
   boxAnsList = [].concat(...boxList)
-  console.log('boxAnsList', boxAnsList)
   return boxAnsList.includes(ans) && boxAnsList.filter(_ => _ == ans).length > 1
 }
-const setStartIndex = ind => {
+const setStartIndex = (ind: number) => {
   if (ind < 3) {
     return 0
   } else if (ind > 2 && ind < 6) {
@@ -106,7 +116,7 @@ const setStartIndex = ind => {
 const numButtonDisable = computed(() => {
   return state.rowIdx == -1 || state.colIdx == -1 || state.sudokuIsEmpty
 })
-let interval
+let interval: any
 const startAnimate = () => {
   state.animateHandler = true
   interval = setInterval(setRandomAnimate, 100)
@@ -133,6 +143,10 @@ const setRandomAnimate = () => {
     }
   }
 }
+
+const checkRule = (ans: sudokuType) => {
+  return checkRowIncludes(ans) || checkColIncludes(ans) || checkBoxIncludes(ans)
+}
 </script>
 
 <template lang="pug">
@@ -150,7 +164,7 @@ const setRandomAnimate = () => {
                             'dashed border-l': ![3, 6].includes(index) && index != 0,
                             'cursor-pointer': item == '.',
                             'active-item': idx == state.rowIdx && index == state.colIdx && (item == '.' || typeof item == 'number'),
-                            'error-item': idx == state.rowIdx && index == state.colIdx && (checkRowIncludes(item) || checkColIncludes(item) || checkBoxIncludes(item)) && typeof item == 'number',
+                            'error-item': idx == state.rowIdx && index == state.colIdx && checkRule(item) && typeof item == 'number',
                             'text-primary font-bold' : typeof item == 'number'}`
                     @click="clickItemBox(idx, index)"
                     ) {{ item == '.' ? '' : item }}

@@ -3,9 +3,13 @@ import { DArrowRight } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import RouterNames from '@/router/name.ts'
 
+type stateType = {
+  drawerVisible: boolean
+}
+
 const state = reactive({
   drawerVisible: false
-})
+}) as stateType
 const openDraw = () => {
   state.drawerVisible = true
 }
