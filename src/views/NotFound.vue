@@ -8,7 +8,7 @@ const router = useRouter()
 onMounted(()=>{
   setTimeout(()=>{
     router.push({
-      name: RouterNames.home
+      name: RouterNames.homeLayout
     })
   }, 1500)
 })
